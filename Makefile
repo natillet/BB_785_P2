@@ -1,4 +1,4 @@
-PROJ_NAME = project1
+PROJ_NAME = project2
 CC = gcc #arm-linux-gnueabi-gcc
 VECTFLAGS = -ftree-vectorize # add more vectorization flags
 CFLAGS = -Wall  -O3 -march=armv7-a -mcpu=cortex-a8  -mfloat-abi=softfp  -mfpu=neon $(VECTFLAGS) -funroll-loops 

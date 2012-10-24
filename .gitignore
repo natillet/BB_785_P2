@@ -1,0 +1,22 @@
+# Object files
+*.o
+
+# Libraries
+*.lib
+*.a
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Results file
+results.txt
+
+# Kernel Module Build things
+.tmp_versions/
+*.cmd
+*.symvers
+*.mod.c
+*.order

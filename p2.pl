@@ -15,7 +15,7 @@ close(FILE);
 for (1 .. 5) {
 	print "Iteration $_\n";
 	my $new_file_buffer;
-	my $cmd_out = `./project1`;
+	my $cmd_out = `./project2`;
 #	print "Result: $cmd_out";
 	push(@results, $cmd_out);
 	open(FILE, "results.txt") or die $!;
@@ -27,13 +27,10 @@ for (1 .. 5) {
 }
 
 foreach my $time (@results) {
-	#Execution Time: 7 sec, 804779251 nsec
-	$time =~ /Execution Time: (\d+) sec, (\d+) nsec/;
-	my $sec = $1;
-	my $nsec = $2;
-	print "$sec\.$nsec\n";
-	my $full_secs = "$sec\.$nsec";
-	$times += $full_secs;
+	$time =~ /Execution duration in cycles \(rounded to the nearest 64 cycles\): (\d+)/;
+	my $cycles = $1;
+	print "$cycles\n";
+	$times += $cycles;
 }
 
 print "Average: " . ($times/5) . "\n";

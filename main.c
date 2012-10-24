@@ -75,12 +75,14 @@ int main (int argc, char * argv[]) {
   int s,i,j;
   float invr, invr3, f, ax, ay, az, dx, dy, dz, dt=0.001;
   float eps=0.0000001;
-  //struct timespec t1, t2, d;
-  int cycles;
+  struct timespec t1, t2, d;
+  FILE *fp;
+  char *outputFilename = "results.txt";
+  unsigned long long cycles;
 
   init();
 
-//  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t1);
+  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t1);
   init_perfcounters(1, 1);
   cycles = get_cyclecount();
 
@@ -113,11 +115,23 @@ int main (int argc, char * argv[]) {
       z[i] = znew[i];
     }
   }
-//  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t2);
-	cycles = get_cyclecount() - cycles;
-	printf("Execution duration in cycles (rounded to the nearest 64 cycles): %ld\n", cycles*64);
-	
-//  diff(&d, t1, t2);
+  cycles = get_cyclecount() - cycles;
+  printf("Execution duration in cycles (rounded to the nearest 64 cycles): %llu\n", cycles*64);
+
+  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t2);
+
+  // Print results to file so we can compare to ensure optimizations do not alter functionality
+  fp = fopen(outputFilename, "w");
+  if (fp == NULL) {
+    fprintf(stderr, "Can't open output file %s!\n", outputFilename);
+    exit(1);
+  }
+  for (i=0; i<N; i++) {
+	fprintf(fp, "%f %f %f\n", x[i], y[i], z[i]);
+  }
+  fclose(fp);
+
+  diff(&d, t1, t2);
 //  printf("Execution Time: %ld sec, %ld nsec\n", d.tv_sec, d.tv_nsec);
   return 0;
 }
