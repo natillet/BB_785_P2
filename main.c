@@ -7,6 +7,7 @@
 #define STEPS 16
 
 typedef signed int int32_t;
+extern void enable_runfast();
 
 float m[N], x[N], y[N], z[N], vx[N], vy[N], vz[N], xnew[N], ynew[N], znew[N];
 
@@ -80,6 +81,7 @@ int main (int argc, char * argv[]) {
   char *outputFilename = "results.txt";
   unsigned long long cycles;
 
+  enable_runfast();
   init();
 
   clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t1);
