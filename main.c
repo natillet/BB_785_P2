@@ -6,7 +6,45 @@
 #define N 1000
 #define STEPS 16
 
+typedef signed int int32_t;
+
 float m[N], x[N], y[N], z[N], vx[N], vy[N], vz[N], xnew[N], ynew[N], znew[N];
+
+static inline unsigned int get_cyclecount (void)
+{
+  unsigned int value;
+  // Read CCNT Register
+  asm volatile ("MRC p15, 0, %0, c9, c13, 0\t\n": "=r"(value));  
+  return value;
+}
+
+static inline void init_perfcounters (int32_t do_reset, int32_t enable_divider)
+{
+  // in general enable all counters (including cycle counter)
+  int32_t value = 1;
+
+  // peform reset:  
+  if (do_reset)
+  {
+    value |= 2;     // reset all counters to zero.
+    value |= 4;     // reset cycle counter to zero.
+  } 
+
+  if (enable_divider)
+    value |= 8;     // enable "by 64" divider for CCNT.
+
+  value |= 16;
+
+  // program the performance-counter control-register:
+  asm volatile ("MCR p15, 0, %0, c9, c12, 0\t\n" :: "r"(value));  
+
+  // enable all counters:  
+  asm volatile ("MCR p15, 0, %0, c9, c12, 1\t\n" :: "r"(0x8000000f));  
+
+  // clear overflows:
+  asm volatile ("MCR p15, 0, %0, c9, c12, 3\t\n" :: "r"(0x8000000f));
+}
+
 
 void  diff(struct timespec * difference, struct timespec start, struct timespec end)
 {
@@ -37,11 +75,14 @@ int main (int argc, char * argv[]) {
   int s,i,j;
   float invr, invr3, f, ax, ay, az, dx, dy, dz, dt=0.001;
   float eps=0.0000001;
-  struct timespec t1, t2, d;
+  //struct timespec t1, t2, d;
+  int cycles;
 
   init();
 
-  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t1);
+//  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t1);
+  init_perfcounters(1, 1);
+  cycles = get_cyclecount();
 
   for (s=0; s<STEPS; s++) {
     for(i=0; i<N; i++) { /* Foreach particle "i" ... */
@@ -72,9 +113,11 @@ int main (int argc, char * argv[]) {
       z[i] = znew[i];
     }
   }
-  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t2);
-
-  diff(&d, t1, t2);
-  printf("Execution Time: %ld sec, %ld nsec\n", d.tv_sec, d.tv_nsec);
+//  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t2);
+	cycles = get_cyclecount() - cycles;
+	printf("Execution duration in cycles (rounded to the nearest 64 cycles): %ld\n", cycles*64);
+	
+//  diff(&d, t1, t2);
+//  printf("Execution Time: %ld sec, %ld nsec\n", d.tv_sec, d.tv_nsec);
   return 0;
 }
