@@ -97,7 +97,7 @@ int main (int argc, char * argv[]) {
 	dx=x[j]-x[i];
 	dy=y[j]-y[i];
 	dz=z[j]-z[i];
-	invr = 1.0/sqrt(dx*dx + dy*dy + dz*dz + eps);
+	invr = 1.0/sqrtf(dx*dx + dy*dy + dz*dz + eps);
 	invr3 = invr*invr*invr;
 	f=m[j]*invr3;
 	ax += f*dx; /* accumulate the acceleration from gravitational attraction */
